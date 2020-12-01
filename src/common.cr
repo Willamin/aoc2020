@@ -1,4 +1,4 @@
-class Bench
+class Bench(T)
   def self.setup(first_label : String, &block)
     self.new(first_label)
       .tap { |bm| yield bm }
@@ -7,26 +7,27 @@ class Bench
   def initialize(@first_label); end
 
   @first_label : String
-  @rows = Array(Tuple(String, Float64, Int64)).new
+  @rows = Array(Tuple(String, String, String, String)).new
 
   def run(label, &block)
     t0, r0, b0 = Process.times, Time.monotonic, GC.stats.total_bytes
-    yield
+    r = yield
     t1, r1, b1 = Process.times, Time.monotonic, GC.stats.total_bytes
 
-    @rows << {label, (r1 - r0).total_seconds, (b1 - b0).to_i64}
+    span = (r1 - r0)
+    s = span.seconds
+    n = span.nanoseconds
+    @rows << {
+      label,
+      sprintf("%d.%0.9d", s, n),
+      "%0.9d" % (b1 - b0).to_i64,
+      r.to_s,
+    }
   end
 
   def to_s(io : IO)
-    full_rows =
-      @rows
-        .map { |a, b, c|
-          [a,
-           sprintf("%.9d", b),
-           sprintf("%.9d", c),
-          ]
-        }
-    full_rows.insert(0, [@first_label, "time", "memory"])
+    full_rows = @rows
+    full_rows.insert(0, {@first_label, "time", "memory", "result"})
 
     column_widths = full_rows.transpose.map(&.map(&.size).max)
     full_rows.each_with_index do |row, row_index|
