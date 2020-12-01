@@ -46,7 +46,7 @@ def day01_improved_sorted(input : String) : Int32
 end
 
 # --- Boilerplate
-Card.puts("Day 02")
+Card.puts("Day 01")
 input = STDIN.gets_to_end
 
 Bench.setup("attempt") { |bm|
