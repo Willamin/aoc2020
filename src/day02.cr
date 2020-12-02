@@ -37,7 +37,7 @@ def day02_part2(input : String) : String
   good_password_count.to_s
 end
 
-def day02_part2_faster(input : String) : String
+def day02_part2_regex(input : String) : String
   good_password_count = 0
   input.lines.each do |line|
     parts = line.split(/[- :]/, remove_empty: true)
@@ -60,6 +60,6 @@ input = STDIN.gets_to_end
 Bench(String).setup("") { |bm|
   bm.run "part 1 scanner" { day02_part1(input) }
   bm.run "part 2 scanner" { day02_part2(input) }
-  bm.run "part 2 regex" { day02_part2_faster(input) }
+  bm.run "part 2 regex" { day02_part2_regex(input) }
 }
   .tap { |b| puts(b) }
